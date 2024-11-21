@@ -1,53 +1,57 @@
 #include<iostream>
-#include<algorithm>
+#include <vector>
+#include <algorithm>
 
 using namespace std;
+
 int T;
 int N;
-int m[100001];
+vector<int> m;
 
-void input(){
+void init(){
     cin >> N;
-    for (int i = 1; i <= N; ++i) 
+    m.resize(N);
+    for (int i = 0; i < N; ++i)
         cin >> m[i];
 }
 
 void solve(){
     int answer = 0;
-    sort(m + 1, m + N + 1);
-
-    int num300 = 0;
-    for (int i = 1; i <= N && m[i] == 300; ++i){
-        ++num300;
-    }
-
-    int s = num300 + 1;
-    int e = N;
+    int s = 0, e = N - 1;
+    int numPad = 0;
+    
+    sort(begin(m), end(m));
     
     while (s <= e){
-        ++answer;
-        if (m[e] > 600){ // this service cannot coexist.
-            --e;
-        }
-        else if (s != e && m[s] + m[e] <= 900){ // both are under 600.
+        if (m[s] == 300){
+            ++numPad;
             ++s;
+        }
+        else if (m[e] > 600) {
+            ++answer;
             --e;
         }
-        else { // sum of both is over 900 or s == e
-            if (num300 > 0) --num300; // combine with 300 if possible
+        else if (s != e && m[s] + m[e] <= 900){
+            ++answer;
             --e;
+            ++s;
+        }  
+        else {
+            if (numPad) --numPad;
+            ++answer;
+            --e; // Should not be ++s
         }
     }
 
-    answer += (num300 / 3) + (num300 % 3 != 0);
+    answer += numPad / 3 + (numPad % 3 != 0);
     cout << answer << '\n';
 }
 
 int main(int argc, char** argv)
 {
     cin >> T;
-    while(T--){
-        input();
+    while (T--){
+        init();
         solve();
     }
    return 0;
